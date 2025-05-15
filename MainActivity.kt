@@ -54,68 +54,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import com.example.miappfg.ui.theme.MiAppFGTheme
 
-val nombre = "Extraño"
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MiAppFGTheme {
-                Scaffold(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(WindowInsets.statusBars.asPaddingValues())
+                var nombre by remember { mutableStateOf("Extraño") }
+
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(WindowInsets.statusBars.asPaddingValues())
                 ) { innerPadding ->
-                    mensaje("Fedu")
+                    actividad(nombre, onNombreCambiar = { nombre = it }) //aca se declara y func y se pasa como parametro a la vez. Cambia el nombre por lo que recibe como 'it'
                 }
             }
-
-            /*
-            MiAppFGTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    mensaje("Federicu")
-                }
-            }
-            * */
-
-
         }
+
     }
 }
 
 @Composable
-fun mensaje(nombre: String) {
-    Column{
-        agregarHeader()
+// Hay que agregar el parámetro 'onNombreCambiar' como función anónima (lambda)
+fun actividad(nombre: String, onNombreCambiar: (String) -> Unit) {
+    var entrada by remember { mutableStateOf("") } // Para guardar lo que se escribe
+
+    Column {
+        agregarHeader(nombre)
         Spacer(modifier = Modifier.height(30.dp))
-        Box(modifier = Modifier
-            .fillMaxWidth(),
-            contentAlignment = Alignment.Center){
-            var texto by remember { mutableStateOf("") }
-            Column(modifier = Modifier
-                .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally){
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 TextField(
-                    value = texto,
-                    onValueChange = { texto = it },
+                    value = entrada, // Muestra en el input lo que guarda 'entrada'
+                    onValueChange = { entrada = it }, // guarda el input en 'entrada' (mientras se va ingresando)
                     label = { Text("Tu nombre") }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(onClick= {
-                    println("Boton presionado")
-                }){
+                Button(onClick = {
+                    onNombreCambiar(entrada) // Actualiza el 'nombre' por el valor en "entrada"
+                }) {
                     Text("Go")
                 }
             }
-
         }
         Spacer(modifier = Modifier.height(60.dp))
         unaCaja()
     }
-
 }
 
 @Composable
-fun agregarHeader() {
+fun agregarHeader(nombre: String) {
     Column {
         Text(text = "Hola "+nombre+"!", color = Color.Red, fontSize = 32.sp)
         Text(
@@ -210,8 +204,8 @@ fun cita(){
 
 @Preview(showBackground = true)
 @Composable
-fun mensajePreview() {
+fun actividadPreview() {
     MiAppFGTheme {
-        mensaje("Prevista")
+        actividad("Prevista", onNombreCambiar = {})
     }
 }
